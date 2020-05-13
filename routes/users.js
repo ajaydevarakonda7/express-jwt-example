@@ -1,7 +1,11 @@
-const controller = require('../controllers/users')
+const controller = require("../controllers/users");
+const { validateToken } = require("../utils");
 
 module.exports = (router) => {
-    router.route('/users').post(controller.add)
+  router
+    .route("/users")
+    .get(validateToken, controller.getAll)
+    .post(controller.add);
 
-    router.route('/login').post(controller.login)
-}
+  router.route("/login").post(controller.login);
+};
