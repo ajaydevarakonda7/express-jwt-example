@@ -24,6 +24,7 @@ const userSchema = new Schema({
 // encrypt password before save
 userSchema.pre("save", function (next) {
   const user = this;
+  
   if (!user.isModified || !user.isNew) {
     // don't rehash if it's an old user
     next();
