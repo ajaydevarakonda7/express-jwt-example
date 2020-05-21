@@ -29,4 +29,20 @@ async function findUser(client, name) {
   });
 }
 
-module.exports = { insertUser, findUser };
+async function getAllUsers(client) {
+  return new Promise((resolve, reject) => {
+    client.query(`SELECT * FROM User`, function (
+      error,
+      result,
+      fields
+    ) {
+      if (error) {
+        reject(error);
+      }
+
+      resolve({ result, fields });
+    });
+  });
+}
+
+module.exports = { insertUser, findUser, getAllUsers };

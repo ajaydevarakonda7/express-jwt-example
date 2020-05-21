@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const environment = process.env.NODE_ENV; // development
 const stage = require("../config")[environment];
-const { insertUser, findUser } = require("../db/user");
+const { insertUser, findUser, getAllUsers } = require("../db/user");
 
 module.exports = {
   add: async function (req, res) {
@@ -65,7 +65,8 @@ module.exports = {
 
   getAll: async function (req, res) {
     try {
-      const allUsers = await User.find({});
+      const { dbClient: client } = req.app.locals;
+      const { result: allUsers } = await getAllUsers(client);
       return res.send(allUsers);
     } catch (err) {
       console.error(err);
