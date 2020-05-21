@@ -5,21 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const environment = process.env.NODE_ENV; // development
 const stage = require("../config")[environment];
-
-async function insertUser(client, name, password) {
-  return new Promise((resolve, reject) => {
-    client.query(
-      `INSERT INTO User(email,password) VALUES('${name}','${password}');`,
-      function (error, result, fields) {
-        if (error) {
-          reject(error);
-        }
-
-        resolve({ result, fields });
-      }
-    );
-  });
-}
+const { insertUser, findUser } = require("../db/user");
 
 module.exports = {
   add: async function (req, res) {
@@ -43,8 +29,11 @@ module.exports = {
   login: async function (req, res) {
     try {
       const { name, password } = req.body;
+      const { dbClient: client } = req.app.locals;
 
-      const user = await User.findOne({ name });
+      // const user = await User.findOne({ name });
+      const { result } = await findUser(client, name);
+      const [ user ] = result;
 
       if (!user) {
         throw new HttpError("User not found", 404);
@@ -54,7 +43,7 @@ module.exports = {
         password: userPassword, // mutil user of pass.
         __v: ignore, // and extras.
         ...userSafe // now we can send this to the user.
-      } = user.toObject();
+      } = user;
       const isSamePassword = await bcrypt.compare(password, user.password);
 
       if (isSamePassword) {
